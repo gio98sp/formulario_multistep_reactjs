@@ -7,9 +7,28 @@ import { UseForm } from './components/UseForm';
 import { ReviewForm } from './components/ReviewForm';
 import { Thanks } from './components/Thanks';
 import { useForm } from './hooks/useForm';
+import { Steps } from './components/Steps';
+import { useState } from 'react';
+
+const formTemplate = {
+  name: '',
+  email: '',
+  review: '',
+  comment: '',
+};
 
 export const App = () => {
-  const formComponents = [<UseForm />, <ReviewForm />, <Thanks />];
+  const [data, setData] = useState(formTemplate);
+
+  const updateFieldHandler = (key, value) => {
+    setData((prev) => { return {...prev, [key]: value}})
+  }
+
+  const formComponents = [
+    <UseForm data={data} updateFieldHandler={updateFieldHandler} />,
+    <ReviewForm data={data} updateFieldHandler={updateFieldHandler} />,
+    <Thanks data={data} />,
+  ];
 
   const { currentStep, currentComponent, changeStep, isFirstStep, isLastStep } =
     useForm(formComponents);
@@ -18,18 +37,14 @@ export const App = () => {
     <div className="App">
       <div className="header">
         <h2>Deixe sua avaliação</h2>
-
         <p>
           Ficamos felizes com a sua compra, utilize o formulário abaixo para avaliar o produto
         </p>
       </div>
-
       <div className="form-container">
-        <p>Etapas</p>
-
+        <Steps currentStep={currentStep} />
         <form onSubmit={(e) => changeStep(currentStep + 1, e)}>
           <div className="inputs-container">{currentComponent}</div>
-
           <div className="actions">
             {!isFirstStep && (
               <button type="button" onClick={() => changeStep(currentStep - 1)}>
@@ -37,7 +52,6 @@ export const App = () => {
                 <span>Voltar</span>
               </button>
             )}
-
             {!isLastStep ? (
               <button type="submit">
                 <span>Avançar</span>
